@@ -1,0 +1,84 @@
+<html>
+<head>
+  <title>Particle Text</title>
+  <meta charset="utf-8" />
+</head>
+
+<body>
+
+  <canvas id="cnv" width=500 height=500>
+  </canvas>
+
+  <script type="text/javascript" src="particles.js"></script>
+
+  <script>
+    var cnv = document.getElementById('cnv');
+    var ctx = cnv.getContext('2d');
+    ctx.font = "normal 200pt Calibri";
+    ctx.fillStyle="black";
+    ctx.fillText("Hello", 0 , 200);
+
+    var imgData = ctx.getImageData(0,0, cnv.width, cnv.height);
+    var data = imgData.data;
+
+
+    var imageHeight = cnv.height;
+    var imageWidth = cnv.width;
+    console.log("i work here");
+
+    var points=[];
+
+
+    for (var i=0; i<data.length; i++){
+      if (data[i]==255){
+        var x, y;
+        x = ((i-i%4)/4 -1)%imageWidth;
+        y = Math.ceil((i-i%4)/4/imageHeight);
+        // x = (i - i%4)%imageWidth/4;
+        // y = Math.ceil((i- i%4)/imageHeight)/4;
+        points.push([x,y]);
+      }
+    }
+
+    ctx.clearRect(0,0,imageWidth, imageHeight);
+
+    var particles = generateParticles(points, points.length/15);
+
+    loop();
+
+    function loop(){
+      clear();
+      draw(particles);
+      queue();
+    }
+
+    function queue() {
+      window.requestAnimationFrame(loop);
+    }
+
+    function clear() {
+      ctx.clearRect(0, 0, cnv.width, cnv.height);
+    }
+
+
+
+    // window.setInterval(function(){
+    //   draw(particles);
+    //   window.setTimeout(function(){
+    //     ctx.clearRect(0,0,imageWidth, imageHeight);
+    //
+    //   }, 0);
+    // }, 0);
+
+
+
+
+
+
+  </script>
+
+
+
+</body>
+
+</html>
