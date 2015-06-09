@@ -1,9 +1,14 @@
 // Global Vars
 var speed;
 var velocity;
-var max_dist = 20;
+var max_dist = 5;
+var max_d_onmouse = 50;
+var max_velocity = 2;
 var max_per_frame = 2;
-
+var max_radius = 4;
+var particleList = [];
+var mousePos = new Vector(0,0);
+var mouseRange = 20;
 
 
 var randRange = function(max,min){
@@ -13,6 +18,190 @@ var randRange = function(max,min){
 var rand = function(max){
   return Math.floor(Math.random()*max);
 }
+
+
+function Vector(x,y){
+  this.x = x || 0;
+  this.y = y || 0;
+}
+
+// Add a vector to another
+Vector.prototype.add = function(vector) {
+  this.x += vector.x;
+  this.y += vector.y;
+}
+
+// Gets the length of the vector
+Vector.prototype.getMagnitude = function () {
+  return Math.sqrt(this.x * this.x + this.y * this.y);
+};
+
+// Gets the angle accounting for the quadrant we're in
+Vector.prototype.getAngle = function () {
+  return Math.atan2(this.y,this.x);
+};
+
+// Allows us to get a new vector from angle and magnitude
+Vector.fromAngle = function (angle, magnitude) {
+  return new Vector(magnitude * Math.cos(angle), magnitude * Math.sin(angle));
+};
+
+
+
+
+
+
+
+
+
+function Particle(point, velocity, acceleration) {
+  var pos = point || new Vector(0,0);
+  // console.log("Position: x: "+pos.x+"y: "+pos.y);
+  this.position = point || new Vector(0, 0);
+  this.velocity = velocity || new Vector(0, 0);
+  this.acceleration = acceleration || new Vector(0, 0);
+  this.radius = randRange(1, max_radius);
+  this.home = new Vector(pos.x, pos.y); // || new Vector(0,0);
+  this.dist = max_dist;
+}
+
+Particle.prototype.move = function () {
+ // Add our current acceleration to our current velocity
+ this.velocity.add(this.acceleration);
+
+ // console.log ("Pos + vel: " + (this.position.x + this.velocity.x) +
+ // "\tHome+max_dist: " + (this.home.x +max_dist));
+
+ // need to know if the new position will be within the bounding box of
+ // the home position, otherwise, shift velocity.
+
+ var minx = this.home.x - this.dist;
+ var maxx = this.home.x + this.dist;
+ var x = this.velocity.x + this.position.x;
+
+ var miny = this.home.y - this.dist;
+ var maxy = this.home.y + this.dist;
+ var y = this.velocity.y + this.position.y;
+
+
+ var rangeMinX = this.position.x - max_dist;
+ var rangeMaxX = this.position.x + max_dist;
+
+ var rangeMinY = this.position.y - max_dist;
+ var rangeMaxY = this.position.y + max_dist;
+
+
+ //applies 30% probability;
+ var randomX = (rand(10)>7);
+ var randomY = (rand(10)>7);
+
+
+ // if (!inRange(rangeMinX, rangeMaxX, x)){
+ //   randomX = false;
+ // }
+ // if (!inRange(rangeMinY, rangeMaxY, y)){
+ //   randomY = false;
+ // }
+
+ if ( !inRange(minx, maxx, x) || (randomX) ){
+   this.velocity.x = this.velocity.x*(-1);
+ }
+ if ( !inRange(miny, maxy, y) || randomY){
+
+    this.velocity.y = this.velocity.y*(-1);
+  }
+
+
+ // if ( (!inRange(minx, maxx, x) && inRange(minx, maxx, this.position.x))  || (randomX) ){
+  //  if (this.dist > max_dist){
+  //    this.dist = max_dist;
+  //  }
+
+
+ // if ( !inRange(minx, maxx, x) || (randomX) ){
+ //   this.velocity.x = this.velocity.x*(-1);
+ // }
+ //
+
+ // if ( ( !inRange(miny, maxy, y)  && inRange(miny, maxy, this.position.y) ) || randomY){
+  //  if (this.dist > max_dist){
+  //    this.dist = max_dist;
+  //  }
+// if ( !inRange(miny, maxy, y) || randomY){
+//
+//    this.velocity.y = this.velocity.y*(-1);
+//  }
+
+ // Add our current velocity to our position
+ this.position.add(this.velocity);
+};
+
+function inRange(lower, upper, elem){
+  if ( (lower < elem) && (upper> elem) ){
+    return true;
+
+  }
+  else{ return false;}
+}
+
+
+
+
+/*
+Mouse move stuff
+
+*/
+
+function setMousePos(canvas, evt){
+  var rect = canvas.getBoundingClientRect();
+  mousePos.x = (evt.clientX - rect.left);
+  mousePos.y = (evt.clientY - rect.top);
+}
+
+cnv.addEventListener('mousemove', function(evt){
+  setMousePos(cnv, evt);
+  console.log("X: "+mousePos.x+" Y: "+ mousePos.y);
+}, false);
+// function getMousePos(canvas, evt) {
+//   var rect = canvas.getBoundingClientRect();
+//   return {
+//     x: evt.clientX - rect.left,
+//     y: evt.clientY - rect.top
+//   };
+// }
+// cnv.addEventListener('mousemove', function(evt) {
+//   mousePos = getMousePos(cnv, evt);
+//   console.log("X: "+mousePos.x+" Y: "+ mousePos.y);
+// }, false);
+
+
+
+/*
+
+Emitter.prototype.emitParticle = function() {
+  // Use an angle randomized over the spread so we have more of a "spray"
+  var angle = this.velocity.getAngle() + this.spread - (Math.random() * this.spread * 2);
+
+  // The magnitude of the emitter's velocity
+  var magnitude = this.velocity.getMagnitude();
+
+  // The emitter's position
+  var position = new Vector(this.position.x, this.position.y);
+
+  // New velocity based off of the calculated angle and magnitude
+  var velocity = Vector.fromAngle(angle, magnitude);
+
+  // return our new Particle!
+  return new Particle(position,velocity);
+};
+
+function update() {
+  addNewParticles();
+  plotParticles(canvas.width, canvas.height);
+}
+
+
+
 
 
 
@@ -25,13 +214,14 @@ function Particle(x,y){
   this.radius = randRange(1,4);
   this.xDir = 1;
   this.yDir = 1;
-  // console.log("X: "+this.x+" Y: "+this.y+" RAD: "+ this.radius);
 }
 
-// function Point(pos){
-//   this.pos = pos;
-//   this.direction = 1;
-// }
+
+*/
+
+
+
+
 
 
 /*
@@ -42,21 +232,26 @@ selected nodes in the particle list;
 */
 var generateParticles = function(pointList, numParts){
   var cpy = pointList.slice();
-  var particleList = [];
+  // var particleList = [];
   for (var z=0; z<numParts; z++){
     var coord_index = rand(cpy.length);
     var coord = cpy.splice(coord_index, 1);
     coord = coord[0];
     x = coord[0];
     y = coord[1];
-    var part = new Particle(x,y);
+    var vect = new Vector(x,y);
+    // var part = new Particle(x,y);
+    var vel = new Vector(randRange(1,max_velocity+1),randRange(1, max_velocity +1));
+
+    var part = new Particle(vect, vel);
+    // console.log(part);
     particleList.push(part);
 
     // console.log("("+part.x+", "+part.y +")");
 
   }
 
-  return particleList;
+  // return particleList;
 }
 
 
@@ -67,6 +262,7 @@ var makeShape = function(x,y, rad){
     // context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
     ctx.arc(x,y, rad, 0, 2*Math.PI, false);
     ctx.rect(x, y, 2, 2);
+    // console.log("meh i work?");
     ctx.fillStyle="#89c0e0";
     ctx.fill();
 }
@@ -76,97 +272,59 @@ var makeShape = function(x,y, rad){
 var draw = function(particles){
   // var cpy = particles.slice();
   for (var z=0; z<particles.length; z++){
-    var x = particles[z].x;
-    var y = particles[z].y;
-    var rad = particles[z].radius;
+    var x = particles[z].position.x;
+    var y = particles[z].position.y;
+    var part = particles[z];
 
-    // console.log("X: "+ x+" Y: "+ y+" RAD: " +particles[z].rad);
-    nextPos(particles[z]);
-    x = particles[z].x;
-    y = particles[z].y;
-    // x = point[0];
-    // y = point[1];
-    // x = nextPos(x, cpy[z].homeX, cpy[z].xDir);
-    // y = nextPos(y, cpy[z].homeY, cpy[z].yDir);
-    // // y = nextPos(y, cpy[z].homeY, max_dist);
-    // makeShape(x, y, cpy[z].radius);
+    // console.log("BEFORE: \tX: "+x+" Y: "+y);
 
-    // x = nextPos(x, cpy[z].homeX, max_dist);
-    // y = nextPos(y, cpy[z].homeY, max_dist);
+    //TODO: do the checking of the bounding box here or in move?
+    // inRange(lower, upper, elem)
+
+    homex = x;// part.home.x;
+    homey = y; //part.home.y;
+    var xInRange =  inRange(mousePos.x- mouseRange, mousePos.x+mouseRange, homex);
+    var yInRange = inRange(mousePos.y- mouseRange, mousePos.y+mouseRange, homey);
+
+    if (xInRange && yInRange){
+      part.dist = max_d_onmouse;
+    }
 
 
-    // console.log("X: "+ x+" Y: "+ y+" RAD: "+ particles[z].radius);
+
+    // if (inRange(mousePos.x- mouseRange, mousePos.x+mouseRange, x) ){
+    //   part.dist = max_d_onmouse;
+    // } else if (  inRange(mousePos.y- mouseRange, mousePos.y+mouseRange, y) ){
+    //   part.dist = max_d_onmouse;
+    // }
+
+
+    particles[z].move();
+
+    x = particles[z].position.x;
+    y = particles[z].position.y;
+    // console.log("AFTER: \tX: "+x+" Y: "+y + "RADIUS: "+particles[z].radius);
     makeShape(x, y, particles[z].radius);
   }
 }
 
-var nextPos = function(particle) {
-  var currX, homeX, dirX, currY, currY, dirY;
-  currX = particle.x;
-  currY = particle.y;
-  particle.x = randRange( (particle.homeX - max_dist), ( particle.homeX + max_dist)); //currX+1;
-  particle.y = randRange( (particle.homeY - max_dist), ( particle.homeY + max_dist)); //currX+1;
-  //particle.y = currY+1;
-  // return;
-
-  // var xdata = posAndDir(currX, particle.homeX, particle.dirX);
-  // var ydata = posAndDir(currY, particle.homeY, particle.dirY);
-  // console.log("XDATA: "+xdata+" YDATA: "+ydata);
-  // particle.x = xdata[0];
-  // particle.xDir = xdata[1];
-  // particle.y = ydata[0];
-  // particle.yDir = ydata[1];
 
 
-  // var moveX = randRange(1,max_per_frame+1)*dirX;
 
-  // var moveX = randRange(1,max_per_frame+1)*dirX;
-  // if ( ( (curr+moveX) > (homeX +max_dist) ) || ( (curr+moveAmt) < (home - moveAmt) ) ){
-  //   dir = dir*(-1);
-  //   return (curr-moveAmt);
-  // }
-  // else{
-  //   return (curr+moveAmt);
-  // }
+function loop(){
+  clear();
+  draw(particleList);
+  // console.log(particleList);
+  queue();
 }
 
-// var posAndDir = function(curr, home, dir){
-//   var move = randRange(1,max_per_frame+1)*dir;
-//   var ls = [0,0];
-//   if ( ( (curr+move) > (home+max_dist) ) || ( (curr+move) < (home - move) ) ){
-//     dir = dir*(-1);
-//     ls[0] = (curr-move);
-//     ls[1] = dir;
-//     return ls;
-//     // return [(curr-move),dir];
-//   }
-//   else{
-//     ls[0] = (curr+move);
-//     ls[1] = dir;
-//     return ls; //[(curr+move),dir];
-//   }
-// }
+function queue() {
+  window.requestAnimationFrame(loop);
+}
 
-
-// var nextPos = function(curr, home, maxd){
-//   var moveAmt = randRange(-max_per_frame, max_per_frame+1);
-//   var mv = curr+moveAmt;
-//   console.log("OLD: "+curr+" NEW: "+mv);
-//   if  ( ( (curr + moveAmt) > (home+maxd) ) || ((curr+moveAmt) < (home-maxd) ) ){
-//           // console.log("OLD: "+curr+" NEW: "+curr+moveAmt);
-//           return curr + moveAmt;
-//   }
-//   else{
-//     return curr - moveAmt;
-//   }
-// }
-  // if (Math.abs(curr + randRange(-, maxd)) > Math.abs(home+  )
-
-
-
-
-
-
+function clear() {
+  ctx.clearRect(0, 0, cnv.width, cnv.height);
+}
 
 
 
