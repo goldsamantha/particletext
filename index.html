@@ -2,73 +2,93 @@
 <head>
   <title>Particle Text</title>
   <meta charset="utf-8" />
+  <link rel="stylesheet" type="text/css" href="main.css">
+
 </head>
 
 <body>
 
-  <canvas id="cnv" width=500 height=500>
+  <canvas id="cnv" width=800 height=500>
   </canvas>
+
+  Enter your name: <input type="text" id="fname" onkeyup="changeText()" autofocus>
+
+  <span id="demo"></span>
+
+// <script>
+// function myFunction() {
+//     var x = document.getElementById("fname").value;
+//     document.getElementById("demo").innerHTML = x;
+// }
+// </script>
+
+
+
+
+
+
 
   <script type="text/javascript" src="particles.js"></script>
 
   <script>
-    var cnv = document.getElementById('cnv');
-    var ctx = cnv.getContext('2d');
-    ctx.font = "normal 200pt Calibri";
-    ctx.fillStyle="black";
-    ctx.fillText("Hello", 0 , 200);
-
-    var imgData = ctx.getImageData(0,0, cnv.width, cnv.height);
-    var data = imgData.data;
 
 
-    var imageHeight = cnv.height;
-    var imageWidth = cnv.width;
-    console.log("i work here");
-
-    var points=[];
-
-
-    for (var i=0; i<data.length; i++){
-      if (data[i]==255){
-        var x, y;
-        x = ((i-i%4)/4 -1)%imageWidth;
-        y = Math.ceil((i-i%4)/4/imageHeight);
-        // x = (i - i%4)%imageWidth/4;
-        // y = Math.ceil((i- i%4)/imageHeight)/4;
-        points.push([x,y]);
-      }
-    }
-
-    ctx.clearRect(0,0,imageWidth, imageHeight);
-
-    var particles = generateParticles(points, points.length/20);
-
-    loop();
-
-    // function loop(){
-    //   clear();
-    //   draw(particles);
-    //   queue();
-    // }
+    // var cnv = document.getElementById('cnv');
+    // var ctx = cnv.getContext('2d');
+    // var txt = "Type";
     //
-    // function queue() {
-    //   window.requestAnimationFrame(loop);
-    // }
+    // startSim(txt);
     //
-    // function clear() {
-    //   ctx.clearRect(0, 0, cnv.width, cnv.height);
+    // function changeText() {
+    //   var x = document.getElementById("fname").value;
+    //   document.getElementById("demo").innerHTML = x;
+    //   txt = x;
+    //   startSim(txt);
+    //
+    //
     // }
 
 
 
-    // window.setInterval(function(){
-    //   draw(particles);
-    //   window.setTimeout(function(){
-    //     ctx.clearRect(0,0,imageWidth, imageHeight);
-    //
-    //   }, 0);
-    // }, 0);
+  //   function startSim(words){
+  //
+  //   // ctx.clearRect(0,0,imageWidth, imageHeight);
+  //   ctx.font = "normal 200pt Calibri";
+  //   ctx.fillStyle="black";
+  //   ctx.fillText(words, 0 , 200);
+  //
+  //   var imgData = ctx.getImageData(0,0, cnv.width, cnv.height);
+  //   var data = imgData.data;
+  //   console.log("Data size: "+data.length);
+  //
+  //
+  //   var imageHeight = cnv.height;
+  //   var imageWidth = cnv.width;
+  //   console.log("i work here");
+  //
+  //   console.log("WIDTH: "+imageWidth+" HEIGHT: "+imageHeight);
+  //
+  //   var points=[];
+  //
+  //   for (var i=0; i<data.length; i++){
+  //     if (data[i]==255){
+  //       var x, y;
+  //       x =  Math.floor(i/4)%imageWidth; //((i-i%4)/4 -1)%imageWidth;
+  //       y = Math.floor(Math.floor(i/4)/imageWidth); //Math.ceil((i-i%4)/4/imageHeight);
+  //       points.push([x,y]);
+  //     }
+  //   }
+  //
+  //   ctx.clearRect(0,0,imageWidth, imageHeight);
+  //
+  //   console.log("LEN: "+(points.length/15));
+  //
+  //   var particles = generateParticles(points, 4);//points.length/15);
+  //
+  //   loop();
+  //
+  // }
+
 
 
 

@@ -1,14 +1,23 @@
 // Global Vars
-var speed;
-var velocity;
-var max_dist = 5;
+var max_dist = 6;
 var max_d_onmouse = 50;
 var max_velocity = 2;
 var max_per_frame = 2;
 var max_radius = 4;
 var particleList = [];
 var mousePos = new Vector(0,0);
-var mouseRange = 20;
+var mouseRange = 28;
+var resetAnim = false;
+var initKeyup = true;
+
+
+
+
+var cnv = document.getElementById('cnv');
+var ctx = cnv.getContext('2d');
+
+// cnv.width = window.innerWidth;
+
 
 
 var randRange = function(max,min){
@@ -63,7 +72,23 @@ function Particle(point, velocity, acceleration) {
   this.radius = randRange(1, max_radius);
   this.home = new Vector(pos.x, pos.y); // || new Vector(0,0);
   this.dist = max_dist;
+  this.onJourney = false;
+  this.movingOut = false;
 }
+
+
+
+var makeRect = function(x1,y1,x2,y2){
+  ctx.beginPath();
+  ctx.rect(x1, y1, x2, y2);
+ //  context.fillStyle = 'yellow';
+ //  context.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'black';
+  ctx.stroke();
+
+}
+
 
 Particle.prototype.move = function () {
  // Add our current acceleration to our current velocity
@@ -84,11 +109,11 @@ Particle.prototype.move = function () {
  var y = this.velocity.y + this.position.y;
 
 
- var rangeMinX = this.position.x - max_dist;
- var rangeMaxX = this.position.x + max_dist;
+ var rangeMinX = this.home.x - max_dist;
+ var rangeMaxX = this.home.x + max_dist;
 
- var rangeMinY = this.position.y - max_dist;
- var rangeMaxY = this.position.y + max_dist;
+ var rangeMinY = this.home.y - max_dist;
+ var rangeMaxY = this.home.y + max_dist;
 
 
  //applies 30% probability;
@@ -96,41 +121,40 @@ Particle.prototype.move = function () {
  var randomY = (rand(10)>7);
 
 
- // if (!inRange(rangeMinX, rangeMaxX, x)){
- //   randomX = false;
- // }
- // if (!inRange(rangeMinY, rangeMaxY, y)){
- //   randomY = false;
- // }
+ if (this.onJourney){
+   var out_of_bounds =  ( !inRange(minx, maxx, x) ||  !inRange(miny, maxy, y) );
+   var inSmallHome = ( inRange(rangeMinX, rangeMaxX, x) && inRange(rangeMinY, rangeMaxY, y) );
 
- if ( !inRange(minx, maxx, x) || (randomX) ){
-   this.velocity.x = this.velocity.x*(-1);
+   if (out_of_bounds){
+     this.velocity.x = this.velocity.x*(-1);
+     this.velocity.y = this.velocity.y*(-1);
+     this.position.add(this.velocity);
+     this.position.add(this.velocity);
+     this.movingOut = false;
+   }
+   else if ( !this.movingOut && inSmallHome){
+     this.onJourney = false;
+     this.dist = max_dist;
+   }
+
+
  }
- if ( !inRange(miny, maxy, y) || randomY){
-
-    this.velocity.y = this.velocity.y*(-1);
-  }
 
 
- // if ( (!inRange(minx, maxx, x) && inRange(minx, maxx, this.position.x))  || (randomX) ){
-  //  if (this.dist > max_dist){
-  //    this.dist = max_dist;
-  //  }
 
 
- // if ( !inRange(minx, maxx, x) || (randomX) ){
- //   this.velocity.x = this.velocity.x*(-1);
- // }
- //
 
- // if ( ( !inRange(miny, maxy, y)  && inRange(miny, maxy, this.position.y) ) || randomY){
-  //  if (this.dist > max_dist){
-  //    this.dist = max_dist;
-  //  }
-// if ( !inRange(miny, maxy, y) || randomY){
-//
-//    this.velocity.y = this.velocity.y*(-1);
-//  }
+ else{
+   // STANDARD FUNCTIONALITY:
+   if ( !inRange(minx, maxx, x) || (randomX) ){
+     this.velocity.x = this.velocity.x*(-1);
+   }
+   if ( !inRange(miny, maxy, y) || randomY){
+
+     this.velocity.y = this.velocity.y*(-1);
+   }
+}
+
 
  // Add our current velocity to our position
  this.position.add(this.velocity);
@@ -160,67 +184,7 @@ function setMousePos(canvas, evt){
 
 cnv.addEventListener('mousemove', function(evt){
   setMousePos(cnv, evt);
-  console.log("X: "+mousePos.x+" Y: "+ mousePos.y);
 }, false);
-// function getMousePos(canvas, evt) {
-//   var rect = canvas.getBoundingClientRect();
-//   return {
-//     x: evt.clientX - rect.left,
-//     y: evt.clientY - rect.top
-//   };
-// }
-// cnv.addEventListener('mousemove', function(evt) {
-//   mousePos = getMousePos(cnv, evt);
-//   console.log("X: "+mousePos.x+" Y: "+ mousePos.y);
-// }, false);
-
-
-
-/*
-
-Emitter.prototype.emitParticle = function() {
-  // Use an angle randomized over the spread so we have more of a "spray"
-  var angle = this.velocity.getAngle() + this.spread - (Math.random() * this.spread * 2);
-
-  // The magnitude of the emitter's velocity
-  var magnitude = this.velocity.getMagnitude();
-
-  // The emitter's position
-  var position = new Vector(this.position.x, this.position.y);
-
-  // New velocity based off of the calculated angle and magnitude
-  var velocity = Vector.fromAngle(angle, magnitude);
-
-  // return our new Particle!
-  return new Particle(position,velocity);
-};
-
-function update() {
-  addNewParticles();
-  plotParticles(canvas.width, canvas.height);
-}
-
-
-
-
-
-
-function Particle(x,y){
-  this.x = x;
-  this.y = y;
-  this.isHover = false;
-  this.homeX = x;
-  this.homeY = y;
-  this.radius = randRange(1,4);
-  this.xDir = 1;
-  this.yDir = 1;
-}
-
-
-*/
-
-
-
 
 
 
@@ -231,8 +195,9 @@ selected nodes in the particle list;
 
 */
 var generateParticles = function(pointList, numParts){
+  // var cpy = [];
   var cpy = pointList.slice();
-  // var particleList = [];
+  console.log("Length After: "+cpy.length);
   for (var z=0; z<numParts; z++){
     var coord_index = rand(cpy.length);
     var coord = cpy.splice(coord_index, 1);
@@ -240,18 +205,14 @@ var generateParticles = function(pointList, numParts){
     x = coord[0];
     y = coord[1];
     var vect = new Vector(x,y);
-    // var part = new Particle(x,y);
     var vel = new Vector(randRange(1,max_velocity+1),randRange(1, max_velocity +1));
 
     var part = new Particle(vect, vel);
-    // console.log(part);
     particleList.push(part);
 
-    // console.log("("+part.x+", "+part.y +")");
 
   }
 
-  // return particleList;
 }
 
 
@@ -259,10 +220,8 @@ var generateParticles = function(pointList, numParts){
 
 var makeShape = function(x,y, rad){
     ctx.beginPath();
-    // context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
     ctx.arc(x,y, rad, 0, 2*Math.PI, false);
     ctx.rect(x, y, 2, 2);
-    // console.log("meh i work?");
     ctx.fillStyle="#89c0e0";
     ctx.fill();
 }
@@ -270,16 +229,11 @@ var makeShape = function(x,y, rad){
 
 
 var draw = function(particles){
-  // var cpy = particles.slice();
   for (var z=0; z<particles.length; z++){
     var x = particles[z].position.x;
     var y = particles[z].position.y;
     var part = particles[z];
 
-    // console.log("BEFORE: \tX: "+x+" Y: "+y);
-
-    //TODO: do the checking of the bounding box here or in move?
-    // inRange(lower, upper, elem)
 
     homex = x;// part.home.x;
     homey = y; //part.home.y;
@@ -287,43 +241,124 @@ var draw = function(particles){
     var yInRange = inRange(mousePos.y- mouseRange, mousePos.y+mouseRange, homey);
 
     if (xInRange && yInRange){
-      part.dist = max_d_onmouse;
+      particles[z].dist = max_d_onmouse;
+      particles[z].onJourney = true;
+      particles[z].movingOut = true;
     }
 
 
 
-    // if (inRange(mousePos.x- mouseRange, mousePos.x+mouseRange, x) ){
-    //   part.dist = max_d_onmouse;
-    // } else if (  inRange(mousePos.y- mouseRange, mousePos.y+mouseRange, y) ){
-    //   part.dist = max_d_onmouse;
-    // }
 
 
     particles[z].move();
 
     x = particles[z].position.x;
     y = particles[z].position.y;
-    // console.log("AFTER: \tX: "+x+" Y: "+y + "RADIUS: "+particles[z].radius);
     makeShape(x, y, particles[z].radius);
   }
 }
 
 
 
-
 function loop(){
-  clear();
+  clearCanv();
   draw(particleList);
-  // console.log(particleList);
   queue();
+
 }
+
+
 
 function queue() {
-  window.requestAnimationFrame(loop);
+  var framerate = 35;
+  if (resetAnim == false){
+    window.setTimeout(loop, framerate);
+  }
+  else{
+    console.log("Resetting Anim");
+    resetAnim = false;
+  }
+  console.log("Frame Rate: "+framerate);
 }
 
-function clear() {
+function clearCanv() {
   ctx.clearRect(0, 0, cnv.width, cnv.height);
+}
+
+
+
+
+
+var txt = "Type";
+
+startSim(txt);
+
+function changeText() {
+  if (initKeyup == true){
+    cnv.width = window.innerWidth;
+
+    initKeyup = false;
+    return;
+  }
+  var x = document.getElementById("fname").value;
+  document.getElementById("demo").innerHTML = x;
+  txt = x;
+  resetAnim = true;
+  startSim(txt);
+
+
+}
+
+// cnv.addEventListener("keyup", function(){
+//   resetAnim = true;
+// });
+
+
+
+
+function startSim(words){
+
+clearCanv();
+ctx.font = "normal 200pt Calibri";
+ctx.fillStyle="black";
+ctx.fillText(words, 0 , 200);
+
+var imgData = ctx.getImageData(0,0, cnv.width, cnv.height);
+var data = imgData.data;
+console.log("Data size: "+data.length);
+
+
+var imageHeight = cnv.height;
+var imageWidth = cnv.width;
+
+console.log("WIDTH: "+imageWidth+" HEIGHT: "+imageHeight);
+
+var points=[];
+
+for (var i=0; i<data.length; i++){
+  if (data[i]==255){
+    var x, y;
+    x =  Math.floor(i/4)%imageWidth;
+    y = Math.floor(Math.floor(i/4)/imageWidth);
+    points.push([x,y]);
+  }
+}
+
+ctx.clearRect(0,0,imageWidth, imageHeight);
+
+console.log("LEN BEFORE: "+(points.length)
+  + "Type: " +typeof(points));
+particleList = [];
+
+//TODO: return here for length
+
+generateParticles(points, points.length/15);
+//var particles = generateParticles(points, points.length/15);
+
+// resetAnim = false;
+
+loop();
+
 }
 
 
