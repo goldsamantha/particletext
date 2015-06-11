@@ -11,16 +11,10 @@
   <canvas id="cnv" width=800 height=500>
   </canvas>
 
-  Enter your name: <input type="text" id="fname" onkeyup="changeText()" autofocus>
+  <input type="text" id="fname" onkeyup="changeText()" autofocus />
 
   <span id="demo"></span>
 
-// <script>
-// function myFunction() {
-//     var x = document.getElementById("fname").value;
-//     document.getElementById("demo").innerHTML = x;
-// }
-// </script>
 
 
 
@@ -30,72 +24,6 @@
 
   <script type="text/javascript" src="particles.js"></script>
 
-  <script>
-
-
-    // var cnv = document.getElementById('cnv');
-    // var ctx = cnv.getContext('2d');
-    // var txt = "Type";
-    //
-    // startSim(txt);
-    //
-    // function changeText() {
-    //   var x = document.getElementById("fname").value;
-    //   document.getElementById("demo").innerHTML = x;
-    //   txt = x;
-    //   startSim(txt);
-    //
-    //
-    // }
-
-
-
-  //   function startSim(words){
-  //
-  //   // ctx.clearRect(0,0,imageWidth, imageHeight);
-  //   ctx.font = "normal 200pt Calibri";
-  //   ctx.fillStyle="black";
-  //   ctx.fillText(words, 0 , 200);
-  //
-  //   var imgData = ctx.getImageData(0,0, cnv.width, cnv.height);
-  //   var data = imgData.data;
-  //   console.log("Data size: "+data.length);
-  //
-  //
-  //   var imageHeight = cnv.height;
-  //   var imageWidth = cnv.width;
-  //   console.log("i work here");
-  //
-  //   console.log("WIDTH: "+imageWidth+" HEIGHT: "+imageHeight);
-  //
-  //   var points=[];
-  //
-  //   for (var i=0; i<data.length; i++){
-  //     if (data[i]==255){
-  //       var x, y;
-  //       x =  Math.floor(i/4)%imageWidth; //((i-i%4)/4 -1)%imageWidth;
-  //       y = Math.floor(Math.floor(i/4)/imageWidth); //Math.ceil((i-i%4)/4/imageHeight);
-  //       points.push([x,y]);
-  //     }
-  //   }
-  //
-  //   ctx.clearRect(0,0,imageWidth, imageHeight);
-  //
-  //   console.log("LEN: "+(points.length/15));
-  //
-  //   var particles = generateParticles(points, 4);//points.length/15);
-  //
-  //   loop();
-  //
-  // }
-
-
-
-
-
-
-
-  </script>
 
 
 

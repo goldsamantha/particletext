@@ -94,12 +94,6 @@ Particle.prototype.move = function () {
  // Add our current acceleration to our current velocity
  this.velocity.add(this.acceleration);
 
- // console.log ("Pos + vel: " + (this.position.x + this.velocity.x) +
- // "\tHome+max_dist: " + (this.home.x +max_dist));
-
- // need to know if the new position will be within the bounding box of
- // the home position, otherwise, shift velocity.
-
  var minx = this.home.x - this.dist;
  var maxx = this.home.x + this.dist;
  var x = this.velocity.x + this.position.x;
@@ -195,7 +189,6 @@ selected nodes in the particle list;
 
 */
 var generateParticles = function(pointList, numParts){
-  // var cpy = [];
   var cpy = pointList.slice();
   console.log("Length After: "+cpy.length);
   for (var z=0; z<numParts; z++){
@@ -222,7 +215,7 @@ var makeShape = function(x,y, rad){
     ctx.beginPath();
     ctx.arc(x,y, rad, 0, 2*Math.PI, false);
     ctx.rect(x, y, 2, 2);
-    ctx.fillStyle="#89c0e0";
+    ctx.fillStyle= "#fff";//"#89c0e0";
     ctx.fill();
 }
 
@@ -235,8 +228,8 @@ var draw = function(particles){
     var part = particles[z];
 
 
-    homex = x;// part.home.x;
-    homey = y; //part.home.y;
+    homex = x;
+    homey = y;
     var xInRange =  inRange(mousePos.x- mouseRange, mousePos.x+mouseRange, homex);
     var yInRange = inRange(mousePos.y- mouseRange, mousePos.y+mouseRange, homey);
 
@@ -270,6 +263,8 @@ function loop(){
 
 
 function queue() {
+
+
   var framerate = 35;
   if (resetAnim == false){
     window.setTimeout(loop, framerate);
@@ -301,18 +296,12 @@ function changeText() {
     return;
   }
   var x = document.getElementById("fname").value;
-  document.getElementById("demo").innerHTML = x;
   txt = x;
   resetAnim = true;
   startSim(txt);
 
 
 }
-
-// cnv.addEventListener("keyup", function(){
-//   resetAnim = true;
-// });
-
 
 
 
@@ -345,18 +334,8 @@ for (var i=0; i<data.length; i++){
 }
 
 ctx.clearRect(0,0,imageWidth, imageHeight);
-
-console.log("LEN BEFORE: "+(points.length)
-  + "Type: " +typeof(points));
 particleList = [];
-
-//TODO: return here for length
-
 generateParticles(points, points.length/15);
-//var particles = generateParticles(points, points.length/15);
-
-// resetAnim = false;
-
 loop();
 
 }

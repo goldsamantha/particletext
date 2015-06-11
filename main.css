@@ -2,3 +2,13 @@
   /*display: none;*/
   opacity: 0;
 }
+
+#cnv{
+  margin: 0 auto;
+}
+
+body{
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+}
