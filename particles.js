@@ -9,14 +9,13 @@ var mousePos = new Vector(0,0);
 var mouseRange = 28;
 var resetAnim = false;
 var initKeyup = true;
+var framerate = 35;
 
 
 
 
 var cnv = document.getElementById('cnv');
 var ctx = cnv.getContext('2d');
-
-// cnv.width = window.innerWidth;
 
 
 
@@ -215,7 +214,7 @@ var makeShape = function(x,y, rad){
     ctx.beginPath();
     ctx.arc(x,y, rad, 0, 2*Math.PI, false);
     ctx.rect(x, y, 2, 2);
-    ctx.fillStyle= "#fff";//"#89c0e0";
+    ctx.fillStyle= "#fff";
     ctx.fill();
 }
 
@@ -265,7 +264,6 @@ function loop(){
 function queue() {
 
 
-  var framerate = 35;
   if (resetAnim == false){
     window.setTimeout(loop, framerate);
   }
