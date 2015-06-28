@@ -306,7 +306,7 @@ function changeText() {
 function startSim(words){
 
 clearCanv();
-ctx.font = "normal 200pt Calibri";
+ctx.font = "normal 200pt sans-serif";
 ctx.fillStyle="black";
 ctx.fillText(words, 0 , 200);
 
