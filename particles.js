@@ -325,7 +325,7 @@ var points=[];
 for (var i=0; i<data.length; i++){
   if (data[i]==255){
     var x, y;
-    x =  Math.floor(i/4)%imageWidth;
+    x = Math.floor(i/4)%imageWidth;
     y = Math.floor(Math.floor(i/4)/imageWidth);
     points.push([x,y]);
   }
